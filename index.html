@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Нашата Свадба</title>
+    <title>Мојата Свадба - Целосен Организатор</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,22 +15,37 @@
     <!-- Херо секција -->
     <div class="hero-section text-center">
         <div class="container">
-            <h1><i class="fa-solid fa-ring"></i>Ирина и Благој Свадба</h1>
-            <p>Организатор на гости, маси и буџет</p>
+            <h1><i class="fa-solid fa-ring"></i> Мојата Свадба</h1>
+            <p>Организатор на гости, маси, план, задачи и буџет</p>
         </div>
     </div>
 
     <div class="container px-3">
-        <!-- Мени за префрлање помеѓу Гости и Буџет -->
+        <!-- Мени со сите табови -->
         <ul class="nav nav-pills nav-justified mb-4 bg-white p-2 rounded-4 shadow-sm" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="guests-tab" data-bs-toggle="pill" data-bs-target="#guests-pane" type="button" role="tab">
-                    <i class="fa-solid fa-users me-2"></i>Гости
+                    <i class="fa-solid fa-users me-1"></i>Гости
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tables-tab" data-bs-toggle="pill" data-bs-target="#tables-pane" type="button" role="tab" onclick="renderTablesView()">
+                    <i class="fa-solid fa-chair me-1"></i>Маси
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="timeline-tab" data-bs-toggle="pill" data-bs-target="#timeline-pane" type="button" role="tab" onclick="renderTimeline()">
+                    <i class="fa-solid fa-clock me-1"></i>План
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tasks-tab" data-bs-toggle="pill" data-bs-target="#tasks-pane" type="button" role="tab" onclick="renderTasks()">
+                    <i class="fa-solid fa-square-check me-1"></i>Задачи
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="budget-tab" data-bs-toggle="pill" data-bs-target="#budget-pane" type="button" role="tab">
-                    <i class="fa-solid fa-wallet me-2"></i>Буџет & Трошоци
+                    <i class="fa-solid fa-wallet me-1"></i>Буџет
                 </button>
             </li>
         </ul>
@@ -39,7 +54,6 @@
             
             <!-- ТАБ 1: ГОСТИ -->
             <div class="tab-pane fade show active" id="guests-pane" role="tabpanel">
-                <!-- Статистика за гости -->
                 <div class="row g-2 mb-3">
                     <div class="col-4">
                         <div class="card stat-card p-2 p-md-3 text-center text-md-start">
@@ -62,7 +76,6 @@
                 </div>
 
                 <div class="row">
-                    <!-- Форма за додавање гостин -->
                     <div class="col-lg-4 mb-4">
                         <div class="card p-3 p-md-4">
                             <h5 class="mb-3 fw-bold"><i class="fa-solid fa-user-plus text-danger"></i> Додај Гостин</h5>
@@ -105,12 +118,14 @@
                         </div>
                     </div>
 
-                    <!-- Список на гости -->
                     <div class="col-lg-8">
                         <div class="card p-3 p-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                 <h5 class="mb-0 fw-bold"><i class="fa-solid fa-address-book text-danger"></i> Список</h5>
                                 <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-dark" onclick="window.print()" title="Печати / Зачувај како PDF">
+                                        <i class="fa-solid fa-print"></i> <span class="d-none d-sm-inline">Печати / PDF</span>
+                                    </button>
                                     <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importData(event)">
                                     <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('importFileInput').click()">
                                         <i class="fa-solid fa-upload"></i> <span class="d-none d-sm-inline">Прикачи</span>
@@ -149,11 +164,11 @@
                                 <table class="table table-hover align-middle">
                                     <thead class="table-light">
                                         <tr>
+                                            <th>Маса</th>
                                             <th>Име</th>
                                             <th>Категорија</th>
                                             <th>Лица</th>
                                             <th>Статус</th>
-                                            <th>Маса</th>
                                             <th class="text-center">Акции</th>
                                         </tr>
                                     </thead>
@@ -165,9 +180,106 @@
                 </div>
             </div>
 
-            <!-- ТАБ 2: БУЏЕТ И ТРОШКОВИ -->
+            <!-- ТАБ 2: РАСПОРЕД ПО МАСИ -->
+            <div class="tab-pane fade" id="tables-pane" role="tabpanel">
+                <div class="card p-3 p-md-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-chair text-danger"></i> Преглед на Маси</h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-sm btn-outline-dark" onclick="window.print()"><i class="fa-solid fa-print"></i> Печати / PDF</button>
+                            <span class="badge bg-danger fs-6" id="tablesCountBadge">Маси: 0</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-4">Преглед на сите распоредени гости по маси и нивната бројност.</p>
+                    <div class="row g-3" id="tablesContainer"></div>
+                </div>
+            </div>
+
+            <!-- ТАБ 3: ДНЕВЕН ПЛАН / СААТНИЦА -->
+            <div class="tab-pane fade" id="timeline-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="card p-3 p-md-4">
+                            <h5 class="mb-3 fw-bold"><i class="fa-solid fa-clock text-danger"></i> Додај Настан во План</h5>
+                            <form id="timelineForm">
+                                <div class="mb-2 mb-md-3">
+                                    <label for="eventTime" class="form-label small fw-semibold">Време (Саатница)</label>
+                                    <input type="text" class="form-control" id="eventTime" required placeholder="Пр. 14:00">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="eventTitle" class="form-label small fw-semibold">Опис / Настан</label>
+                                    <textarea class="form-control" id="eventTitle" rows="3" required placeholder="Пр. Собирање кај младоженецот со музика"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold"><i class="fa-solid fa-plus me-1"></i> Додај во План</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card p-3 p-md-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-calendar-days text-danger"></i> Саатница за Свадбениот Ден</h5>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-sm btn-outline-dark" onclick="window.print()"><i class="fa-solid fa-print"></i> Печати / PDF</button>
+                                    <span class="badge bg-danger fs-6" id="timelineCountBadge">Настани: 0</span>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-3">Редослед на настани за денот на свадбата.</p>
+
+                            <div id="mobileTimelineContainer"></div>
+
+                            <div class="table-responsive desktop-table-view">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 25%;">Време</th>
+                                            <th style="width: 60%;">Настан</th>
+                                            <th class="text-center" style="width: 15%;">Акции</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timelineTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТАБ 4: CHECKLIST / ЗАДАЧИ -->
+            <div class="tab-pane fade" id="tasks-pane" role="tabpanel">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="card p-3 p-md-4">
+                            <h5 class="mb-3 fw-bold"><i class="fa-solid fa-list-check text-danger"></i> Додај Задача</h5>
+                            <form id="taskForm">
+                                <div class="mb-3">
+                                    <label for="taskTitle" class="form-label small fw-semibold">Назив на обврска / задача</label>
+                                    <input type="text" class="form-control" id="taskTitle" required placeholder="Пр. Нарачување торта">
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold"><i class="fa-solid fa-plus me-1"></i> Додај Задача</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card p-3 p-md-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-check-double text-danger"></i> Свадбена Checklist</h5>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-sm btn-outline-dark" onclick="window.print()"><i class="fa-solid fa-print"></i> Печати / PDF</button>
+                                    <span class="badge bg-danger fs-6" id="tasksCountBadge">Завршени: 0/0</span>
+                                </div>
+                            </div>
+                            <p class="text-muted small mb-3">Штиклирајте ги обврските како што ги завршувате.</p>
+
+                            <ul class="list-group list-group-flush" id="tasksContainer"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТАБ 5: БУЏЕТ И ТРОШКОВИ -->
             <div class="tab-pane fade" id="budget-pane" role="tabpanel">
-                <!-- Статистика за буџет -->
                 <div class="row g-2 mb-3">
                     <div class="col-4">
                         <div class="card stat-card p-2 p-md-3 text-center text-md-start">
@@ -190,7 +302,6 @@
                 </div>
 
                 <div class="row">
-                    <!-- Форма за нов трошок -->
                     <div class="col-lg-4 mb-4">
                         <div class="card p-3 p-md-4">
                             <h5 class="mb-3 fw-bold"><i class="fa-solid fa-euro-sign text-danger"></i> Додај Трошок</h5>
@@ -217,10 +328,12 @@
                         </div>
                     </div>
 
-                    <!-- Список на трошоци -->
                     <div class="col-lg-8">
                         <div class="card p-3 p-md-4">
-                            <h5 class="mb-3 fw-bold"><i class="fa-solid fa-list-check text-danger"></i> Список на Трошоци</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check text-danger"></i> Список на Трошоци</h5>
+                                <button class="btn btn-sm btn-outline-dark" onclick="window.print()"><i class="fa-solid fa-print"></i> Печати / PDF</button>
+                            </div>
                             
                             <div id="mobileExpensesContainer"></div>
 
@@ -304,6 +417,19 @@
     <script>
         let guests = JSON.parse(localStorage.getItem('wedding_guests')) || [];
         let expenses = JSON.parse(localStorage.getItem('wedding_expenses')) || [];
+        let timeline = JSON.parse(localStorage.getItem('wedding_timeline')) || [];
+        
+        const defaultTasks = [
+            { title: 'Избран ресторан / сала', done: false },
+            { title: 'Капарисана музика / бенд', done: false },
+            { title: 'Избран фотограф и видеограф', done: false },
+            { title: 'Избрани бурми', done: false },
+            { title: 'Нарачани свадбени покани', done: false },
+            { title: 'Избрани одела / фустан', done: false },
+            { title: 'Нарачана торта и десерти', done: false }
+        ];
+        let tasks = JSON.parse(localStorage.getItem('wedding_tasks')) || defaultTasks;
+
         let currentFilter = 'Сите';
         let editModal;
 
@@ -311,6 +437,8 @@
             editModal = new bootstrap.Modal(document.getElementById('editGuestModal'));
             renderGuests();
             renderExpenses();
+            renderTimeline();
+            renderTasks();
         });
 
         // ================= GOSTI LOGIKA =================
@@ -345,10 +473,23 @@
 
             const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-            const filteredGuests = guests.filter(guest => {
+            // Филтрирање
+            let filteredGuests = guests.filter(guest => {
                 const matchesCategory = (currentFilter === 'Сите') || (guest.category === currentFilter);
                 const matchesSearch = guest.name.toLowerCase().includes(searchQuery);
                 return matchesCategory && matchesSearch;
+            });
+
+            // СОРТИРАЊЕ ПО МАСИ (Прво Маса 1, Маса 2..., а на крај оние Без Маса)
+            filteredGuests.sort((a, b) => {
+                const tA = a.table ? a.table.trim() : '';
+                const tB = b.table ? b.table.trim() : '';
+
+                if (tA === '' && tB !== '') return 1;
+                if (tA !== '' && tB === '') return -1;
+                if (tA === '' && tB === '') return 0;
+
+                return tA.localeCompare(tB, undefined, { numeric: true, sensitivity: 'base' });
             });
 
             let categoryPersonsSum = 0;
@@ -370,11 +511,11 @@
 
                     let row = `
                         <tr>
+                            <td class="fw-bold text-danger">${guest.table ? 'Маса ' + guest.table : '<span class="text-muted fw-normal">-</span>'}</td>
                             <td class="fw-semibold">${guest.name}</td>
                             <td><span class="badge bg-secondary">${guest.category}</span></td>
                             <td>${guest.count}</td>
                             <td><span class="badge ${badgeClass}">${guest.status}</span></td>
-                            <td>${guest.table || '-'}</td>
                             <td class="text-center">
                                 <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditModal(${originalIndex})"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteGuest(${originalIndex})"><i class="fa-solid fa-trash"></i></button>
@@ -457,6 +598,226 @@
             }
         }
 
+        // ================= MASI LOGIKA =================
+        function renderTablesView() {
+            const tablesContainer = document.getElementById('tablesContainer');
+            tablesContainer.innerHTML = '';
+
+            const tablesMap = {};
+            const unassigned = [];
+
+            guests.forEach(guest => {
+                const tableNum = guest.table ? guest.table.trim() : '';
+                if (tableNum === '') {
+                    unassigned.push(guest);
+                } else {
+                    if (!tablesMap[tableNum]) tablesMap[tableNum] = [];
+                    tablesMap[tableNum].push(guest);
+                }
+            });
+
+            const sortedTableKeys = Object.keys(tablesMap).sort((a, b) => {
+                return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            document.getElementById('tablesCountBadge').innerText = `Маси: ${sortedTableKeys.length}`;
+
+            sortedTableKeys.forEach(tableNum => {
+                const guestList = tablesMap[tableNum];
+                let tablePersonsSum = 0;
+                let guestListHTML = '';
+
+                guestList.forEach(g => {
+                    tablePersonsSum += parseInt(g.count);
+                    let badgeClass = g.status === 'Потврдено' ? 'bg-success' : (g.status === 'Одбиено' ? 'bg-danger' : 'bg-warning text-dark');
+                    guestListHTML += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0 border-bottom">
+                            <div>
+                                <span class="fw-semibold small">${g.name}</span>
+                                <small class="text-muted d-block" style="font-size:0.75rem;">${g.category}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge ${badgeClass} mb-1" style="font-size:0.7rem;">${g.status}</span>
+                                <small class="d-block text-muted" style="font-size:0.75rem;">Лица: ${g.count}</small>
+                            </div>
+                        </li>
+                    `;
+                });
+
+                let tableCardHTML = `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card table-card p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <h6 class="fw-bold mb-0 text-danger"><i class="fa-solid fa-chair me-1"></i> Маса ${tableNum}</h6>
+                                <span class="badge bg-danger rounded-pill fs-7">Вкупно лица: ${tablePersonsSum}</span>
+                            </div>
+                            <ul class="list-group list-group-flush">${guestListHTML}</ul>
+                        </div>
+                    </div>
+                `;
+                tablesContainer.innerHTML += tableCardHTML;
+            });
+
+            if (unassigned.length > 0) {
+                let unassignedPersonsSum = 0;
+                let unassignedListHTML = '';
+
+                unassigned.forEach(g => {
+                    unassignedPersonsSum += parseInt(g.count);
+                    unassignedListHTML += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0 border-bottom">
+                            <div>
+                                <span class="fw-semibold small">${g.name}</span>
+                                <small class="text-muted d-block" style="font-size:0.75rem;">${g.category}</small>
+                            </div>
+                            <span class="badge bg-secondary" style="font-size:0.75rem;">Лица: ${g.count}</span>
+                        </li>
+                    `;
+                });
+
+                let unassignedCardHTML = `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card table-card table-card-unassigned p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <h6 class="fw-bold mb-0 text-secondary"><i class="fa-solid fa-user-slash me-1"></i> Без Маса</h6>
+                                <span class="badge bg-secondary rounded-pill fs-7">Вкупно лица: ${unassignedPersonsSum}</span>
+                            </div>
+                            <ul class="list-group list-group-flush">${unassignedListHTML}</ul>
+                        </div>
+                    </div>
+                `;
+                tablesContainer.innerHTML += unassignedCardHTML;
+            }
+
+            if (sortedTableKeys.length === 0 && unassigned.length === 0) {
+                tablesContainer.innerHTML = `<div class="col-12 text-center text-muted py-5">Нема внесено гости за приказ по маси.</div>`;
+            }
+        }
+
+        // ================= DNEVEN PLAN / TIMELINE LOGIKA =================
+        const timelineForm = document.getElementById('timelineForm');
+        const timelineTableBody = document.getElementById('timelineTableBody');
+        const mobileTimelineContainer = document.getElementById('mobileTimelineContainer');
+
+        function renderTimeline() {
+            timelineTableBody.innerHTML = '';
+            mobileTimelineContainer.innerHTML = '';
+
+            timeline.sort((a, b) => a.time.localeCompare(b.time));
+
+            document.getElementById('timelineCountBadge').innerText = `Настани: ${timeline.length}`;
+
+            if (timeline.length === 0) {
+                const emptyMsg = `<div class="text-center text-muted py-4 small">Нема внесени настани во планот.</div>`;
+                timelineTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-4">Нема внесени настани.</td></tr>`;
+                mobileTimelineContainer.innerHTML = emptyMsg;
+                return;
+            }
+
+            timeline.forEach((item, index) => {
+                let row = `
+                    <tr>
+                        <td class="fw-bold text-danger"><i class="fa-regular fa-clock me-1"></i> ${item.time}</td>
+                        <td>${item.title}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTimelineItem(${index})"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+                timelineTableBody.innerHTML += row;
+
+                let mobileCard = `
+                    <div class="mobile-timeline-card">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-danger fs-6"><i class="fa-regular fa-clock me-1"></i> ${item.time}</span>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTimelineItem(${index})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <p class="mb-0 text-dark fw-semibold" style="font-size: 0.95rem;">${item.title}</p>
+                    </div>
+                `;
+                mobileTimelineContainer.innerHTML += mobileCard;
+            });
+
+            localStorage.setItem('wedding_timeline', JSON.stringify(timeline));
+        }
+
+        timelineForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            timeline.push({
+                time: document.getElementById('eventTime').value,
+                title: document.getElementById('eventTitle').value
+            });
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventTitle').value = '';
+            renderTimeline();
+        });
+
+        function deleteTimelineItem(index) {
+            if (confirm('Дали сакате да го избришете овој настан од планот?')) {
+                timeline.splice(index, 1);
+                renderTimeline();
+            }
+        }
+
+        // ================= CHECKLIST / TASKS LOGIKA =================
+        const taskForm = document.getElementById('taskForm');
+        const tasksContainer = document.getElementById('tasksContainer');
+
+        function renderTasks() {
+            tasksContainer.innerHTML = '';
+            let completedCount = 0;
+
+            if (tasks.length === 0) {
+                tasksContainer.innerHTML = `<li class="list-group-item text-center text-muted py-4">Нема додадено задачи.</li>`;
+                document.getElementById('tasksCountBadge').innerText = `Завршени: 0/0`;
+                return;
+            }
+
+            tasks.forEach((task, index) => {
+                if (task.done) completedCount++;
+
+                let itemHTML = `
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-bottom">
+                        <div class="form-check me-2">
+                            <input class="form-check-input" type="checkbox" id="taskCheck_${index}" ${task.done ? 'checked' : ''} onchange="toggleTaskDone(${index})">
+                            <label class="form-check-label fw-semibold ${task.done ? 'task-completed' : 'text-dark'}" for="taskCheck_${index}">
+                                ${task.title}
+                            </label>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${index})">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </li>
+                `;
+                tasksContainer.innerHTML += itemHTML;
+            });
+
+            document.getElementById('tasksCountBadge').innerText = `Завршени: ${completedCount}/${tasks.length}`;
+            localStorage.setItem('wedding_tasks', JSON.stringify(tasks));
+        }
+
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            tasks.push({
+                title: document.getElementById('taskTitle').value,
+                done: false
+            });
+            document.getElementById('taskTitle').value = '';
+            renderTasks();
+        });
+
+        function toggleTaskDone(index) {
+            tasks[index].done = !tasks[index].done;
+            renderTasks();
+        }
+
+        function deleteTask(index) {
+            if (confirm('Дали сакате да ја избришете оваа задача?')) {
+                tasks.splice(index, 1);
+                renderTasks();
+            }
+        }
+
         // ================= TROSROCI / BUCET LOGIKA =================
         const expenseForm = document.getElementById('expenseForm');
         const expenseTableBody = document.getElementById('expenseTableBody');
@@ -476,25 +837,19 @@
 
                 let badgeClass = expense.status === 'Платено' ? 'bg-success' : 'bg-danger';
 
-                // Desktop Табела
                 let row = `
                     <tr>
                         <td class="fw-semibold">${expense.title}</td>
                         <td class="fw-bold">${amount} €</td>
                         <td><span class="badge ${badgeClass}">${expense.status}</span></td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-success me-1" onclick="toggleExpenseStatus(${index})" title="Промени статус">
-                                <i class="fa-solid fa-arrow-rotate-left"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${index})">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <button class="btn btn-sm btn-outline-success me-1" onclick="toggleExpenseStatus(${index})" title="Промени статус"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${index})"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
                 expenseTableBody.innerHTML += row;
 
-                // Mobile Картичка
                 let mobileCard = `
                     <div class="mobile-expense-card">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -504,12 +859,8 @@
                         <div class="d-flex justify-content-between align-items-center pt-2 border-top">
                             <span class="badge ${badgeClass}">${expense.status}</span>
                             <div>
-                                <button class="btn btn-sm btn-outline-success btn-action-mobile me-1" onclick="toggleExpenseStatus(${index})">
-                                    <i class="fa-solid fa-sync me-1"></i> Смени
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger btn-action-mobile" onclick="deleteExpense(${index})">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
+                                <button class="btn btn-sm btn-outline-success btn-action-mobile me-1" onclick="toggleExpenseStatus(${index})"><i class="fa-solid fa-sync me-1"></i> Смени</button>
+                                <button class="btn btn-sm btn-outline-danger btn-action-mobile" onclick="deleteExpense(${index})"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     </div>
@@ -550,7 +901,7 @@
 
         // ================= IMPORT / EXPORT =================
         function exportData() {
-            const fullData = { guests: guests, expenses: expenses };
+            const fullData = { guests: guests, expenses: expenses, timeline: timeline, tasks: tasks };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -569,13 +920,17 @@
                 try {
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
-                        guests = imported; // за компатибилност со постариот фајл
+                        guests = imported;
                     } else {
                         if (imported.guests) guests = imported.guests;
                         if (imported.expenses) expenses = imported.expenses;
+                        if (imported.timeline) timeline = imported.timeline;
+                        if (imported.tasks) tasks = imported.tasks;
                     }
                     renderGuests();
                     renderExpenses();
+                    renderTimeline();
+                    renderTasks();
                     alert('Податоците се успешно прикачени!');
                 } catch (err) {
                     alert('Грешка при читање: ' + err.message);

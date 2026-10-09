@@ -49,12 +49,13 @@ body {
     box-shadow: 0 2px 8px rgba(255, 117, 140, 0.4);
 }
 
-/* Навигација со табови */
+/* Navigacija so tabovi */
 .nav-pills .nav-link {
     color: #6c757d;
     font-weight: 600;
     border-radius: 12px;
-    padding: 10px 20px;
+    padding: 10px 8px;
+    font-size: 0.8rem;
 }
 
 .nav-pills .nav-link.active {
@@ -63,7 +64,7 @@ body {
     box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
 }
 
-/* Поле за пребарување */
+/* Pole za prebaruvanje */
 .search-box {
     border-radius: 12px;
     border: 1px solid #dee2e6;
@@ -76,8 +77,27 @@ body {
     box-shadow: 0 0 0 0.25rem rgba(255, 117, 140, 0.25);
 }
 
-/* Мобилни прилагодувања (Cards) */
-.mobile-guest-card, .mobile-expense-card {
+/* Karticki za Masi */
+.table-card {
+    border: 1px solid #edf2f7;
+    border-top: 4px solid #ff758c;
+    border-radius: 14px;
+    background: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.table-card-unassigned {
+    border-top-color: #6c757d;
+}
+
+/* Stil za zavrseni zadaci */
+.task-completed {
+    text-decoration: line-through;
+    color: #a0aec0;
+}
+
+/* Mobilni karticki */
+.mobile-guest-card, .mobile-expense-card, .mobile-timeline-card {
     display: none;
     background: #ffffff;
     border-radius: 12px;
@@ -92,7 +112,7 @@ body {
         display: none;
     }
     
-    .mobile-guest-card, .mobile-expense-card {
+    .mobile-guest-card, .mobile-expense-card, .mobile-timeline-card {
         display: block;
     }
     
@@ -117,8 +137,94 @@ body {
         padding-bottom: 5px;
         -webkit-overflow-scrolling: touch;
     }
-    
-    .filter-group-mobile::-webkit-scrollbar {
-        display: none;
+}
+
+/* ================= PRINT / PDF PRECISETEN STIL ================= */
+@media print {
+    body {
+        background-color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Skrij nepotrebni elementi */
+    .hero-section,
+    #mainTabs,
+    .btn,
+    .input-group,
+    .filter-group-mobile,
+    form,
+    .col-lg-4,
+    .stat-card,
+    .alert,
+    #mobileGuestCardsContainer,
+    #mobileExpensesContainer,
+    #mobileTimelineContainer {
+        display: none !important;
+    }
+
+    /* Prikazi go aktivniot tab */
+    .tab-pane {
+        display: none !important;
+    }
+    .tab-pane.active {
+        display: block !important;
+    }
+
+    /* Sirina na cela strana */
+    .col-lg-8, .col-12, .col-md-6 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    .desktop-table-view {
+        display: block !important;
+    }
+
+    /* Skrij koloni Status i Akcii vo tabelata */
+    .table th:nth-child(5),
+    .table td:nth-child(5),
+    .table th:last-child,
+    .table td:last-child {
+        display: none !important;
+    }
+
+    .table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 12px !important;
+    }
+
+    .table th, .table td {
+        border: 1px solid #ddd !important;
+        padding: 4px 8px !important;
+    }
+
+    /* PRICINA ZA SLIKA 1: Sreduvanje na PRINT za TABOT MASI */
+    #tablesContainer {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+
+    #tablesContainer .col-md-6, 
+    #tablesContainer .col-lg-4 {
+        width: 48% !important;
+        display: block !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 10px !important;
+    }
+
+    .table-card {
+        border: 1px solid #aaa !important;
+        border-top: 3px solid #ff758c !important;
+        padding: 8px !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .table-card .badge {
+        display: none !important;
     }
 }
