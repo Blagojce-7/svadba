@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мојата Свадба - Целосен Организатор</title>
+    <title>Нашата Свадба</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Надворешен CSS -->
+    <!-- Nadvoresen CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Херо секција -->
+    <!-- Hero sekcija -->
     <div class="hero-section text-center">
         <div class="container">
-            <h1><i class="fa-solid fa-ring"></i> Мојата Свадба</h1>
+            <h1><i class="fa-solid fa-ring"></i>Благој и Ирина Свадба</h1>
             <p>Организатор на гости, маси, план, задачи и буџет</p>
         </div>
     </div>
 
     <div class="container px-3">
-        <!-- Мени со сите табови -->
+        <!-- Meni so tabovi -->
         <ul class="nav nav-pills nav-justified mb-4 bg-white p-2 rounded-4 shadow-sm" id="mainTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="guests-tab" data-bs-toggle="pill" data-bs-target="#guests-pane" type="button" role="tab">
@@ -52,7 +52,7 @@
 
         <div class="tab-content" id="mainTabsContent">
             
-            <!-- ТАБ 1: ГОСТИ -->
+            <!-- TAB 1: GOSTI -->
             <div class="tab-pane fade show active" id="guests-pane" role="tabpanel">
                 <div class="row g-2 mb-3">
                     <div class="col-4">
@@ -180,7 +180,7 @@
                 </div>
             </div>
 
-            <!-- ТАБ 2: РАСПОРЕД ПО МАСИ -->
+            <!-- TAB 2: MASI -->
             <div class="tab-pane fade" id="tables-pane" role="tabpanel">
                 <div class="card p-3 p-md-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -195,7 +195,7 @@
                 </div>
             </div>
 
-            <!-- ТАБ 3: ДНЕВЕН ПЛАН / СААТНИЦА -->
+            <!-- TAB 3: DNEVEN PLAN / TIMELINE -->
             <div class="tab-pane fade" id="timeline-pane" role="tabpanel">
                 <div class="row">
                     <div class="col-lg-4 mb-4">
@@ -245,7 +245,7 @@
                 </div>
             </div>
 
-            <!-- ТАБ 4: CHECKLIST / ЗАДАЧИ -->
+            <!-- TAB 4: CHECKLIST / ZADACI -->
             <div class="tab-pane fade" id="tasks-pane" role="tabpanel">
                 <div class="row">
                     <div class="col-lg-4 mb-4">
@@ -278,7 +278,7 @@
                 </div>
             </div>
 
-            <!-- ТАБ 5: БУЏЕТ И ТРОШКОВИ -->
+            <!-- TAB 5: BUCET I TROSROCI -->
             <div class="tab-pane fade" id="budget-pane" role="tabpanel">
                 <div class="row g-2 mb-3">
                     <div class="col-4">
@@ -358,7 +358,7 @@
         </div>
     </div>
 
-    <!-- Модал за измена на гостин -->
+    <!-- Modal za izmena na gostin -->
     <div class="modal fade" id="editGuestModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0">
@@ -412,6 +412,31 @@
         </div>
     </div>
 
+    <!-- Modal za Brzo dodeluvanje Gostin na Masa -->
+    <div class="modal fade" id="assignGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="assignModalTitle"><i class="fa-solid fa-chair text-danger me-2"></i> Додај Гостин</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignGuestForm">
+                        <input type="hidden" id="assignTargetTable">
+                        <div class="mb-3">
+                            <label for="assignGuestSelect" class="form-label small fw-semibold">Избери Гостин од Списокот</label>
+                            <select class="form-select" id="assignGuestSelect" required></select>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Откажи</button>
+                            <button type="submit" class="btn btn-danger rounded-3 px-4 fw-semibold">Додај на Маса</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS & Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -431,14 +456,16 @@
         let tasks = JSON.parse(localStorage.getItem('wedding_tasks')) || defaultTasks;
 
         let currentFilter = 'Сите';
-        let editModal;
+        let editModal, assignModal;
 
         document.addEventListener('DOMContentLoaded', function() {
             editModal = new bootstrap.Modal(document.getElementById('editGuestModal'));
+            assignModal = new bootstrap.Modal(document.getElementById('assignGuestModal'));
             renderGuests();
             renderExpenses();
             renderTimeline();
             renderTasks();
+            renderTablesView();
         });
 
         // ================= GOSTI LOGIKA =================
@@ -473,14 +500,12 @@
 
             const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-            // Филтрирање
             let filteredGuests = guests.filter(guest => {
                 const matchesCategory = (currentFilter === 'Сите') || (guest.category === currentFilter);
                 const matchesSearch = guest.name.toLowerCase().includes(searchQuery);
                 return matchesCategory && matchesSearch;
             });
 
-            // СОРТИРАЊЕ ПО МАСИ (Прво Маса 1, Маса 2..., а на крај оние Без Маса)
             filteredGuests.sort((a, b) => {
                 const tA = a.table ? a.table.trim() : '';
                 const tB = b.table ? b.table.trim() : '';
@@ -564,6 +589,7 @@
             document.getElementById('guestName').value = '';
             document.getElementById('guestCount').value = "1";
             renderGuests();
+            renderTablesView();
         });
 
         function openEditModal(index) {
@@ -589,18 +615,21 @@
             };
             editModal.hide();
             renderGuests();
+            renderTablesView();
         });
 
         function deleteGuest(index) {
             if (confirm('Дали сте сигурни дека сакате да го избришете овој гостин?')) {
                 guests.splice(index, 1);
                 renderGuests();
+                renderTablesView();
             }
         }
 
-        // ================= MASI LOGIKA =================
+        // ================= MASI LOGIKA (SO ODTSRANUVANJE OD MASA) =================
         function renderTablesView() {
             const tablesContainer = document.getElementById('tablesContainer');
+            if (!tablesContainer) return;
             tablesContainer.innerHTML = '';
 
             const tablesMap = {};
@@ -628,17 +657,22 @@
                 let guestListHTML = '';
 
                 guestList.forEach(g => {
+                    const originalIndex = guests.indexOf(g);
                     tablePersonsSum += parseInt(g.count);
                     let badgeClass = g.status === 'Потврдено' ? 'bg-success' : (g.status === 'Одбиено' ? 'bg-danger' : 'bg-warning text-dark');
+                    
+                    // DODADENO KOPCE x za Otstranuvanje od masa
                     guestListHTML += `
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0 border-bottom">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1 border-0 border-bottom">
                             <div>
                                 <span class="fw-semibold small">${g.name}</span>
-                                <small class="text-muted d-block" style="font-size:0.75rem;">${g.category}</small>
+                                <small class="text-muted d-block" style="font-size:0.75rem;">${g.category} (${g.count} лица)</small>
                             </div>
-                            <div class="text-end">
-                                <span class="badge ${badgeClass} mb-1" style="font-size:0.7rem;">${g.status}</span>
-                                <small class="d-block text-muted" style="font-size:0.75rem;">Лица: ${g.count}</small>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="badge ${badgeClass}" style="font-size:0.7rem;">${g.status}</span>
+                                <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="removeGuestFromTable(${originalIndex})" title="Отстрани од маса">
+                                    <i class="fa-solid fa-xmark fs-6"></i>
+                                </button>
                             </div>
                         </li>
                     `;
@@ -649,7 +683,10 @@
                         <div class="card table-card p-3 h-100">
                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                 <h6 class="fw-bold mb-0 text-danger"><i class="fa-solid fa-chair me-1"></i> Маса ${tableNum}</h6>
-                                <span class="badge bg-danger rounded-pill fs-7">Вкупно лица: ${tablePersonsSum}</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <button class="btn btn-sm btn-outline-danger py-0 px-2 fw-bold" onclick="openAssignModal('${tableNum}')" title="Додај гостин на оваа маса">+ Додај</button>
+                                    <span class="badge bg-danger rounded-pill fs-7">Лица: ${tablePersonsSum}</span>
+                                </div>
                             </div>
                             <ul class="list-group list-group-flush">${guestListHTML}</ul>
                         </div>
@@ -665,7 +702,7 @@
                 unassigned.forEach(g => {
                     unassignedPersonsSum += parseInt(g.count);
                     unassignedListHTML += `
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2 border-0 border-bottom">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1 border-0 border-bottom">
                             <div>
                                 <span class="fw-semibold small">${g.name}</span>
                                 <small class="text-muted d-block" style="font-size:0.75rem;">${g.category}</small>
@@ -680,7 +717,7 @@
                         <div class="card table-card table-card-unassigned p-3 h-100">
                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                 <h6 class="fw-bold mb-0 text-secondary"><i class="fa-solid fa-user-slash me-1"></i> Без Маса</h6>
-                                <span class="badge bg-secondary rounded-pill fs-7">Вкупно лица: ${unassignedPersonsSum}</span>
+                                <span class="badge bg-secondary rounded-pill fs-7">Лица: ${unassignedPersonsSum}</span>
                             </div>
                             <ul class="list-group list-group-flush">${unassignedListHTML}</ul>
                         </div>
@@ -694,12 +731,71 @@
             }
         }
 
+        // Funkcija za OTSTRANUVANJE na gostin od masa (go stavi vo "Bez masa")
+        function removeGuestFromTable(index) {
+            const guest = guests[index];
+            if (confirm(`Дали сакате да го отстраните "${guest.name}" од Маса ${guest.table}?`)) {
+                guest.table = '';
+                renderGuests();
+                renderTablesView();
+            }
+        }
+
+        function openAssignModal(tableNum) {
+            document.getElementById('assignTargetTable').value = tableNum;
+            document.getElementById('assignModalTitle').innerHTML = `<i class="fa-solid fa-chair text-danger me-2"></i> Додај Гостин на Маса ${tableNum}`;
+            
+            const select = document.getElementById('assignGuestSelect');
+            select.innerHTML = '<option value="">-- Избери гостин --</option>';
+
+            if (guests.length === 0) {
+                select.innerHTML = '<option value="">Нема внесено гости во системот</option>';
+            } else {
+                guests.forEach((g, idx) => {
+                    let text = `${g.name} (${g.count} лица)`;
+                    if (g.table && g.table.trim() !== '') {
+                        text += ` - (Веќе на Маса ${g.table})`;
+                    } else {
+                        text += ` - (Без маса)`;
+                    }
+                    select.innerHTML += `<option value="${idx}">${text}</option>`;
+                });
+            }
+
+            assignModal.show();
+        }
+
+        document.getElementById('assignGuestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const guestIndex = document.getElementById('assignGuestSelect').value;
+            const targetTable = document.getElementById('assignTargetTable').value;
+
+            if (guestIndex === '') {
+                alert('Ве молиме изберете гостин.');
+                return;
+            }
+
+            const guest = guests[guestIndex];
+            const oldTable = guest.table ? guest.table.trim() : '';
+
+            if (oldTable !== '' && oldTable !== targetTable) {
+                alert(`Гостинот "${guest.name}" веќе беше доделен на Маса ${oldTable}.\nСега е префрлен на Маса ${targetTable}!`);
+            }
+
+            guest.table = targetTable;
+            
+            assignModal.hide();
+            renderGuests();
+            renderTablesView();
+        });
+
         // ================= DNEVEN PLAN / TIMELINE LOGIKA =================
         const timelineForm = document.getElementById('timelineForm');
         const timelineTableBody = document.getElementById('timelineTableBody');
         const mobileTimelineContainer = document.getElementById('mobileTimelineContainer');
 
         function renderTimeline() {
+            if(!timelineTableBody) return;
             timelineTableBody.innerHTML = '';
             mobileTimelineContainer.innerHTML = '';
 
@@ -764,6 +860,7 @@
         const tasksContainer = document.getElementById('tasksContainer');
 
         function renderTasks() {
+            if(!tasksContainer) return;
             tasksContainer.innerHTML = '';
             let completedCount = 0;
 
@@ -824,6 +921,7 @@
         const mobileExpensesContainer = document.getElementById('mobileExpensesContainer');
 
         function renderExpenses() {
+            if(!expenseTableBody) return;
             expenseTableBody.innerHTML = '';
             mobileExpensesContainer.innerHTML = '';
 
@@ -931,6 +1029,7 @@
                     renderExpenses();
                     renderTimeline();
                     renderTasks();
+                    renderTablesView();
                     alert('Податоците се успешно прикачени!');
                 } catch (err) {
                     alert('Грешка при читање: ' + err.message);
