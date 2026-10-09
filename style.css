@@ -49,8 +49,35 @@ body {
     box-shadow: 0 2px 8px rgba(255, 117, 140, 0.4);
 }
 
-/* Мобилни прилагодувања (Cards наместо Табела) */
-.mobile-guest-card {
+/* Навигација со табови */
+.nav-pills .nav-link {
+    color: #6c757d;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 20px;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #ff758c;
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 117, 140, 0.3);
+}
+
+/* Поле за пребарување */
+.search-box {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+.search-box:focus {
+    border-color: #ff758c;
+    box-shadow: 0 0 0 0.25rem rgba(255, 117, 140, 0.25);
+}
+
+/* Мобилни прилагодувања (Cards) */
+.mobile-guest-card, .mobile-expense-card {
     display: none;
     background: #ffffff;
     border-radius: 12px;
@@ -62,11 +89,11 @@ body {
 
 @media (max-width: 767.98px) {
     .desktop-table-view {
-        display: none; /* Скриј ја класичната табела на мобилен */
+        display: none;
     }
     
-    .mobile-guest-card {
-        display: block; /* Прикажи картички на мобилен */
+    .mobile-guest-card, .mobile-expense-card {
+        display: block;
     }
     
     .hero-section {
@@ -92,6 +119,6 @@ body {
     }
     
     .filter-group-mobile::-webkit-scrollbar {
-        display: none; /* Скриј scrollbar */
+        display: none;
     }
 }
