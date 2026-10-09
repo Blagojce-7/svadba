@@ -1,0 +1,97 @@
+body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 40px;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    color: white;
+    padding: 25px 15px;
+    border-radius: 0 0 24px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(255, 117, 140, 0.3);
+}
+
+.hero-section h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.hero-section p {
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    border-radius: 16px;
+}
+
+.stat-card {
+    border-left: 5px solid #ff758c;
+    transition: transform 0.2s;
+}
+
+.filter-btn {
+    border-radius: 20px !important;
+    padding: 6px 16px;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.filter-btn.active {
+    background-color: #ff758c !important;
+    color: white !important;
+    border-color: #ff758c !important;
+    box-shadow: 0 2px 8px rgba(255, 117, 140, 0.4);
+}
+
+/* Мобилни прилагодувања (Cards наместо Табела) */
+.mobile-guest-card {
+    display: none;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+@media (max-width: 767.98px) {
+    .desktop-table-view {
+        display: none; /* Скриј ја класичната табела на мобилен */
+    }
+    
+    .mobile-guest-card {
+        display: block; /* Прикажи картички на мобилен */
+    }
+    
+    .hero-section {
+        padding: 20px 10px;
+    }
+    
+    .btn-action-mobile {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+    
+    .modal-dialog {
+        margin: 12px;
+    }
+    
+    .filter-group-mobile {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .filter-group-mobile::-webkit-scrollbar {
+        display: none; /* Скриј scrollbar */
+    }
+}

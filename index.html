@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мојата Свадба - Организатор на Гости</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Твојот надворешен CSS фајл -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Херо секција -->
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1><i class="fa-solid fa-ring"></i> Мојата Свадба</h1>
+            <p>Организатор на гости, потврди и маси</p>
+        </div>
+    </div>
+
+    <div class="container px-3">
+        <!-- Статистика / Dashboard -->
+        <div class="row g-2 mb-3">
+            <div class="col-4">
+                <div class="card stat-card p-2 p-md-3 text-center text-md-start">
+                    <h6 class="text-muted small mb-1">Вкупно</h6>
+                    <h3 id="totalGuestsCount" class="fw-bold mb-0 text-danger">0</h3>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card stat-card p-2 p-md-3 text-center text-md-start" style="border-left-color: #28a745;">
+                    <h6 class="text-muted small mb-1">Потврдени</h6>
+                    <h3 id="confirmedCount" class="fw-bold mb-0 text-success">0</h3>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card stat-card p-2 p-md-3 text-center text-md-start" style="border-left-color: #ffc107;">
+                    <h6 class="text-muted small mb-1">Чекаат</h6>
+                    <h3 id="pendingCount" class="fw-bold mb-0 text-warning">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Форма за додавање гости и список -->
+        <div class="row">
+            <!-- Форма за нов гостин -->
+            <div class="col-lg-4 mb-4">
+                <div class="card p-3 p-md-4">
+                    <h5 class="mb-3 fw-bold"><i class="fa-solid fa-user-plus text-danger"></i> Додај Гостин</h5>
+                    <form id="guestForm">
+                        <div class="mb-2 mb-md-3">
+                            <label for="guestName" class="form-label small fw-semibold">Име и Презиме</label>
+                            <input type="text" class="form-control" id="guestName" required placeholder="Пр. Александар Петров">
+                        </div>
+                        <div class="row g-2 mb-2 mb-md-3">
+                            <div class="col-6">
+                                <label for="guestCategory" class="form-label small fw-semibold">Категорија</label>
+                                <select class="form-select" id="guestCategory">
+                                    <option value="Младоженец">Младоженец</option>
+                                    <option value="Невеста">Невеста</option>
+                                    <option value="Заеднички">Заеднички</option>
+                                    <option value="Деца">Деца</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="guestCount" class="form-label small fw-semibold">Број лица</label>
+                                <input type="number" class="form-control" id="guestCount" value="1" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label for="guestStatus" class="form-label small fw-semibold">Статус</label>
+                                <select class="form-select" id="guestStatus">
+                                    <option value="Чека" selected>Чека</option>
+                                    <option value="Потврдено">Потврдено</option>
+                                    <option value="Одбиено">Одбиено</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="tableNumber" class="form-label small fw-semibold">Маса</label>
+                                <input type="text" class="form-control" id="tableNumber" placeholder="Пр. 1">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold"><i class="fa-solid fa-plus me-1"></i> Зачувај Гостин</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Список на гости -->
+            <div class="col-lg-8">
+                <div class="card p-3 p-md-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-address-book text-danger"></i> Список</h5>
+                        <div class="d-flex gap-2">
+                            <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="importData(event)">
+                            <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('importFileInput').click()">
+                                <i class="fa-solid fa-upload"></i> <span class="d-none d-sm-inline">Прикачи</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportData()">
+                                <i class="fa-solid fa-download"></i> <span class="d-none d-sm-inline">Симни</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Филтри за категории (Скролабилни на мобилен) -->
+                    <div class="mb-3">
+                        <div class="filter-group-mobile d-flex gap-1" role="group">
+                            <button type="button" class="btn btn-outline-secondary filter-btn active" onclick="setFilter('Сите', this)">Сите</button>
+                            <button type="button" class="btn btn-outline-secondary filter-btn" onclick="setFilter('Младоженец', this)">Младоженец</button>
+                            <button type="button" class="btn btn-outline-secondary filter-btn" onclick="setFilter('Невеста', this)">Невеста</button>
+                            <button type="button" class="btn btn-outline-secondary filter-btn" onclick="setFilter('Заеднички', this)">Заеднички</button>
+                            <button type="button" class="btn btn-outline-secondary filter-btn" onclick="setFilter('Деца', this)">Деца</button>
+                        </div>
+                    </div>
+
+                    <!-- Инфо за селектирана категорија -->
+                    <div class="alert alert-light border d-flex justify-content-between align-items-center py-2 px-3 mb-3 rounded-3">
+                        <span class="text-muted small">Категорија: <strong id="filterCategoryLabel">Сите</strong></span>
+                        <span class="badge bg-danger fs-6" id="filterCountBadge">Вкупно лица: 0</span>
+                    </div>
+
+                    <!-- ПРИКАЗ 1: Картички за МОБИЛЕН -->
+                    <div id="mobileGuestCardsContainer"></div>
+
+                    <!-- ПРИКАЗ 2: Табела за ДЕСКТОП -->
+                    <div class="table-responsive desktop-table-view">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Име</th>
+                                    <th>Категорија</th>
+                                    <th>Лица</th>
+                                    <th>Статус</th>
+                                    <th>Маса</th>
+                                    <th class="text-center">Акции</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guestTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модал (Поп-ап) за измена на гостин -->
+    <div class="modal fade" id="editGuestModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-pen-to-square text-danger"></i> Измени Гостин</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editGuestForm">
+                        <input type="hidden" id="editGuestIndex">
+                        <div class="mb-3">
+                            <label for="editGuestName" class="form-label small fw-semibold">Име и Презиме</label>
+                            <input type="text" class="form-control" id="editGuestName" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label for="editGuestCategory" class="form-label small fw-semibold">Категорија</label>
+                                <select class="form-select" id="editGuestCategory">
+                                    <option value="Младоженец">Младоженец</option>
+                                    <option value="Невеста">Невеста</option>
+                                    <option value="Заеднички">Заеднички</option>
+                                    <option value="Деца">Деца</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="editGuestCount" class="form-label small fw-semibold">Број лица</label>
+                                <input type="number" class="form-control" id="editGuestCount" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label for="editGuestStatus" class="form-label small fw-semibold">Статус</label>
+                                <select class="form-select" id="editGuestStatus">
+                                    <option value="Чека">Чека</option>
+                                    <option value="Потврдено">Потврдено</option>
+                                    <option value="Одбиено">Одбиено</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="editTableNumber" class="form-label small fw-semibold">Маса</label>
+                                <input type="text" class="form-control" id="editTableNumber">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Откажи</button>
+                            <button type="submit" class="btn btn-primary rounded-3 px-4 fw-semibold">Зачувај</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let guests = JSON.parse(localStorage.getItem('wedding_guests')) || [];
+        let currentFilter = 'Сите';
+        let editModal;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            editModal = new bootstrap.Modal(document.getElementById('editGuestModal'));
+        });
+
+        const guestForm = document.getElementById('guestForm');
+        const editGuestForm = document.getElementById('editGuestForm');
+        const guestTableBody = document.getElementById('guestTableBody');
+        const mobileGuestCardsContainer = document.getElementById('mobileGuestCardsContainer');
+        
+        const totalGuestsCount = document.getElementById('totalGuestsCount');
+        const confirmedCount = document.getElementById('confirmedCount');
+        const pendingCount = document.getElementById('pendingCount');
+        
+        const filterCategoryLabel = document.getElementById('filterCategoryLabel');
+        const filterCountBadge = document.getElementById('filterCountBadge');
+
+        const guestCategorySelect = document.getElementById('guestCategory');
+        const guestStatusSelect = document.getElementById('guestStatus');
+        const tableNumberInput = document.getElementById('tableNumber');
+
+        if (localStorage.getItem('last_category')) {
+            guestCategorySelect.value = localStorage.getItem('last_category');
+        }
+        if (localStorage.getItem('last_table')) {
+            tableNumberInput.value = localStorage.getItem('last_table');
+        }
+
+        function setFilter(category, btnElement) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderGuests();
+        }
+
+        function renderGuests() {
+            guestTableBody.innerHTML = '';
+            mobileGuestCardsContainer.innerHTML = '';
+
+            let totalPersons = 0;
+            let totalConfirmed = 0;
+            let totalPending = 0;
+
+            guests.forEach(guest => {
+                totalPersons += parseInt(guest.count);
+                if (guest.status === 'Потврдено') totalConfirmed += parseInt(guest.count);
+                if (guest.status === 'Чека') totalPending += parseInt(guest.count);
+            });
+
+            totalGuestsCount.innerText = totalPersons;
+            confirmedCount.innerText = totalConfirmed;
+            pendingCount.innerText = totalPending;
+
+            const filteredGuests = guests.filter(guest => {
+                if (currentFilter === 'Сите') return true;
+                return guest.category === currentFilter;
+            });
+
+            let categoryPersonsSum = 0;
+            filteredGuests.forEach(g => categoryPersonsSum += parseInt(g.count));
+
+            filterCategoryLabel.innerText = currentFilter;
+            filterCountBadge.innerText = `Вкупно лица: ${categoryPersonsSum}`;
+
+            if (filteredGuests.length === 0) {
+                const emptyMsg = `<div class="text-center text-muted py-4 small">Нема гости во категоријата "${currentFilter}"</div>`;
+                guestTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Нема гости во категоријата "${currentFilter}"</td></tr>`;
+                mobileGuestCardsContainer.innerHTML = emptyMsg;
+            } else {
+                filteredGuests.forEach((guest) => {
+                    const originalIndex = guests.indexOf(guest);
+
+                    let badgeClass = 'bg-warning text-dark';
+                    if (guest.status === 'Потврдено') badgeClass = 'bg-success';
+                    if (guest.status === 'Одбиено') badgeClass = 'bg-danger';
+
+                    // Desktop Табела
+                    let row = `
+                        <tr>
+                            <td class="fw-semibold">${guest.name}</td>
+                            <td><span class="badge bg-secondary">${guest.category}</span></td>
+                            <td>${guest.count}</td>
+                            <td><span class="badge ${badgeClass}">${guest.status}</span></td>
+                            <td>${guest.table || '-'}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditModal(${originalIndex})">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteGuest(${originalIndex})">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    guestTableBody.innerHTML += row;
+
+                    // Mobile Картички
+                    let mobileCard = `
+                        <div class="mobile-guest-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="fw-bold mb-1">${guest.name}</h6>
+                                    <span class="badge bg-secondary me-1" style="font-size:0.75rem;">${guest.category}</span>
+                                    <span class="badge ${badgeClass}" style="font-size:0.75rem;">${guest.status}</span>
+                                </div>
+                                <span class="badge bg-light text-dark border" style="font-size:0.8rem;">
+                                    <i class="fa-solid fa-chair text-muted me-1"></i>${guest.table ? 'Маса ' + guest.table : 'Без маса'}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                <span class="small text-muted"><i class="fa-solid fa-users me-1"></i>Лица: <strong>${guest.count}</strong></span>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary btn-action-mobile me-1" onclick="openEditModal(${originalIndex})">
+                                        <i class="fa-solid fa-pen me-1"></i> Измени
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger btn-action-mobile" onclick="deleteGuest(${originalIndex})">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    mobileGuestCardsContainer.innerHTML += mobileCard;
+                });
+            }
+
+            localStorage.setItem('wedding_guests', JSON.stringify(guests));
+        }
+
+        guestForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedCategory = guestCategorySelect.value;
+            const selectedStatus = guestStatusSelect.value;
+            const enteredTable = tableNumberInput.value;
+
+            const newGuest = {
+                name: document.getElementById('guestName').value,
+                category: selectedCategory,
+                count: document.getElementById('guestCount').value,
+                status: selectedStatus,
+                table: enteredTable
+            };
+
+            guests.push(newGuest);
+            
+            localStorage.setItem('last_category', selectedCategory);
+            localStorage.setItem('last_table', enteredTable);
+
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestCount').value = "1";
+            document.getElementById('guestName').focus();
+
+            renderGuests();
+        });
+
+        function openEditModal(index) {
+            const guest = guests[index];
+            document.getElementById('editGuestIndex').value = index;
+            document.getElementById('editGuestName').value = guest.name;
+            document.getElementById('editGuestCategory').value = guest.category;
+            document.getElementById('editGuestCount').value = guest.count;
+            document.getElementById('editGuestStatus').value = guest.status;
+            document.getElementById('editTableNumber').value = guest.table || '';
+            
+            editModal.show();
+        }
+
+        editGuestForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const index = document.getElementById('editGuestIndex').value;
+
+            guests[index] = {
+                name: document.getElementById('editGuestName').value,
+                category: document.getElementById('editGuestCategory').value,
+                count: document.getElementById('editGuestCount').value,
+                status: document.getElementById('editGuestStatus').value,
+                table: document.getElementById('editTableNumber').value
+            };
+
+            editModal.hide();
+            renderGuests();
+        });
+
+        function deleteGuest(index) {
+            if (confirm('Дали сте сигурни дека сакате да го избришете овој гостин?')) {
+                guests.splice(index, 1);
+                renderGuests();
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(guests, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "wedding_guests.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedGuests = JSON.parse(e.target.result);
+                    if (Array.isArray(importedGuests)) {
+                        guests = importedGuests;
+                        renderGuests();
+                        alert('Податоците се успешно прикачени!');
+                    } else {
+                        alert('Невалиден формат на JSON фајл.');
+                    }
+                } catch (err) {
+                    alert('Грешка при читање: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        renderGuests();
+    </script>
+</body>
+</html>
