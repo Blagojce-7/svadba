@@ -238,6 +238,84 @@ function deleteGuest(index) {
 let emptyTables = JSON.parse(localStorage.getItem('wedding_empty_tables')) || [];
 
 // ================= MASI LOGIKA =================
+function renameTable(oldTableNum) {
+    const newTableNum = prompt(
+        `Маса ${oldTableNum}\nВнеси нов број на маса:`,
+        oldTableNum
+    );
+
+    if (newTableNum === null) return;
+
+    const newNum = newTableNum.trim();
+
+    if (!/^\d+$/.test(newNum) || Number(newNum) < 1) {
+        alert('Внеси валиден број на маса.');
+        return;
+    }
+
+    if (newNum === oldTableNum) return;
+
+    const oldNum = Number(oldTableNum);
+    const targetNum = Number(newNum);
+
+    // Ако бројот е помал, помести ги другите маси за едно место нагоре
+    if (targetNum < oldNum) {
+        guests.forEach(g => {
+            if (!g.table || !/^\d+$/.test(g.table.trim())) return;
+
+            const n = Number(g.table);
+
+            if (n >= targetNum && n < oldNum) {
+                g.table = String(n + 1);
+            } else if (n === oldNum) {
+                g.table = String(targetNum);
+            }
+        });
+
+        emptyTables = emptyTables.map(t => {
+            if (!/^\d+$/.test(String(t))) return t;
+
+            const n = Number(t);
+
+            if (n >= targetNum && n < oldNum) return String(n + 1);
+            if (n === oldNum) return String(targetNum);
+
+            return t;
+        });
+    } else {
+        // Ако бројот е поголем, помести ги другите маси за едно место надолу
+        guests.forEach(g => {
+            if (!g.table || !/^\d+$/.test(g.table.trim())) return;
+
+            const n = Number(g.table);
+
+            if (n > oldNum && n <= targetNum) {
+                g.table = String(n - 1);
+            } else if (n === oldNum) {
+                g.table = String(targetNum);
+            }
+        });
+
+        emptyTables = emptyTables.map(t => {
+            if (!/^\d+$/.test(String(t))) return t;
+
+            const n = Number(t);
+
+            if (n > oldNum && n <= targetNum) return String(n - 1);
+            if (n === oldNum) return String(targetNum);
+
+            return t;
+        });
+    }
+
+    emptyTables = [...new Set(emptyTables)];
+
+    localStorage.setItem('wedding_empty_tables', JSON.stringify(emptyTables));
+
+    renderGuests();
+    renderTablesView();
+}
+
 function renderTablesView() {
     const tablesContainer = document.getElementById('tablesContainer');
     if (!tablesContainer) return;
@@ -305,7 +383,15 @@ function renderTablesView() {
                         <div class="d-flex align-items-center gap-2">
                             <div class="table-number-icon"><i class="fa-solid fa-utensils"></i></div>
                             <div>
-                                <h6 class="fw-bold mb-1 text-dark">Маса ${tableNum}</h6>
+                                <h6 class="fw-bold mb-1 text-dark">
+    Маса ${tableNum}
+    <button
+        class="btn btn-sm btn-outline-secondary ms-1"
+        onclick="renameTable('${tableNum}')"
+        title="Преименувај маса">
+        <i class="fa-solid fa-pen"></i>
+    </button>
+</h6>
                                 <small class="text-muted">${guestList.length} ${guestList.length === 1 ? 'група гости' : 'групи гости'}</small>
                             </div>
                         </div>
