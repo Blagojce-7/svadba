@@ -134,10 +134,10 @@ function renderGuests() {
             } else if (guest.category === 'Деца') {
                 borderStyle = 'border-left-color: #20c997;';
                 catBadge = 'bg-success';
-            } else if (guest.category === 'Заеднички') {
-                borderStyle = 'border-left-color: #6f42c1;';
-                catBadge = 'bg-purple';
-            }
+} else if (guest.category === 'Заеднички') {
+    borderStyle = 'border-left-color: #6f42c1;';
+    catBadge = 'bg-purple text-dark';
+}
 
             let row = `
                 <tr>

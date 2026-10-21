@@ -502,3 +502,8 @@ html, body {
 .assign-guest-option-meta { color: #6c757d; font-size: .82rem; }
 .assign-guest-empty { padding: 14px 12px; color: #6c757d; font-size: .9rem; }
 #assignGuestSearch { min-height: 44px; }
+
+.bg-purple {
+    background-color: #e9d5ff !important;
+    color: #4c1d95 !important;
+}
