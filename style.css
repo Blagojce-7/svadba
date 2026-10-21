@@ -187,12 +187,32 @@ html, body {
     }
 }
 
-/* ================= СТИЛОВИ ЗА PRINT / PDF ================= */
+/* ================= PRINT / PDF: PREGLED NA MASI ================= */
 @media print {
-    body {
-        background-color: #ffffff !important;
-        padding: 0 !important;
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    html, body {
+        width: 100% !important;
+        min-width: 0 !important;
         margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #111 !important;
+        font-size: 10pt !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .container, .container-fluid, .row, main, .tab-content, .tab-pane.active,
+    #tablesContainer {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
     }
 
     .hero-section,
@@ -206,69 +226,108 @@ html, body {
     .alert,
     #mobileGuestCardsContainer,
     #mobileExpensesContainer,
-    #mobileTimelineContainer {
+    #mobileTimelineContainer,
+    .modal,
+    .modal-backdrop {
         display: none !important;
     }
 
-    .tab-pane {
-        display: none !important;
-    }
-    .tab-pane.active {
-        display: block !important;
-    }
+    .tab-pane { display: none !important; }
+    .tab-pane.active { display: block !important; }
 
-    .col-lg-8, .col-12, .col-md-6 {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: 0 0 100% !important;
-    }
-
-    .desktop-table-view {
-        display: block !important;
-    }
-
-    .table th:nth-child(5),
-    .table td:nth-child(5),
-    .table th:last-child,
-    .table td:last-child {
-        display: none !important;
-    }
-
-    .table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        font-size: 12px !important;
-    }
-
-    .table th, .table td {
-        border: 1px solid #ddd !important;
-        padding: 4px 8px !important;
-    }
-
+    /* Ispecati gi masite vo dve koloni, so iskoristena sirina */
     #tablesContainer {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 10px !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7mm !important;
+        align-items: start !important;
     }
 
-    #tablesContainer .col-md-6, 
-    #tablesContainer .col-lg-4 {
-        width: 48% !important;
+    #tablesContainer > div,
+    #tablesContainer .col-md-6,
+    #tablesContainer .col-lg-4,
+    #tablesContainer > .col-12 {
         display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        flex: initial !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        break-inside: avoid !important;
         page-break-inside: avoid !important;
-        margin-bottom: 10px !important;
     }
 
     .table-card {
-        border: 1px solid #aaa !important;
-        border-top: 3px solid #ff758c !important;
-        padding: 8px !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 4mm !important;
+        border: 1px solid #b8b8b8 !important;
+        border-top: 2px solid #555 !important;
+        border-radius: 3mm !important;
         background: #fff !important;
         box-shadow: none !important;
+        color: #111 !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    .table-card h5,
+    .table-card h6 {
+        font-size: 12pt !important;
+        margin: 0 0 2mm !important;
+        color: #111 !important;
+    }
+
+    .table-card .text-muted,
+    .table-card small {
+        color: #444 !important;
     }
 
     .table-card .badge {
+        display: inline-block !important;
+        color: #111 !important;
+        background: #eee !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+
+    .table-card .list-group,
+    .table-card .guest-list,
+    .table-card .table-guests {
+        width: 100% !important;
+    }
+
+    .table-card .list-group-item,
+    .table-card .guest-item,
+    .table-card .guest-card {
+        padding: 2.5mm !important;
+        margin-bottom: 1.5mm !important;
+        border: 1px solid #e0e0e0 !important;
+        border-left: 2px solid #777 !important;
+        border-radius: 2mm !important;
+        box-shadow: none !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        font-size: 9pt !important;
+    }
+
+    .table-card .remove-chair-btn,
+    .table-card .btn-close,
+    .table-card button,
+    .table-card .btn {
         display: none !important;
+    }
+
+    .table-card hr {
+        margin: 2mm 0 !important;
+        border-color: #ccc !important;
+    }
+
+    /* Ako ima golema tabela, dozvoli da prodolzi na sledna strana */
+    #tablesContainer .table-card {
+        overflow: visible !important;
     }
 }
 
@@ -351,3 +410,95 @@ html, body {
     justify-content: center;
     cursor: pointer;
 }
+
+/* Почитлив список на гости по маси */
+.table-number-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #fff0f2;
+    color: #dc3545;
+    font-size: 1rem;
+}
+.table-guests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.table-guest-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    padding: 11px 10px 11px 13px;
+    border: 1px solid #edf0f3;
+    border-left: 4px solid var(--guest-accent, #0d6efd);
+    border-radius: 10px;
+    background: #fff;
+}
+.table-guest-info { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.table-guest-name { color: #212529; font-weight: 600; font-size: .92rem; overflow-wrap: anywhere; }
+.table-guest-meta { color: #7b8490; font-size: .76rem; }
+.table-guest-actions { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+.table-guest-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 7px;
+    border-radius: 8px;
+    background: #f1f3f5;
+    color: #495057;
+    font-weight: 700;
+    font-size: .82rem;
+}
+.table-remove-guest {
+    width: 27px; height: 27px; border: 0; border-radius: 8px;
+    background: #fff0f0; color: #dc3545; font-size: 1.1rem; line-height: 1;
+}
+.table-remove-guest:hover { background: #dc3545; color: #fff; }
+.table-empty-state {
+    padding: 24px 12px;
+    text-align: center;
+    border: 1px dashed #d9dee4;
+    border-radius: 12px;
+    color: #7b8490;
+    font-size: .9rem;
+}
+.table-empty-state i { display: block; font-size: 1.5rem; color: #adb5bd; }
+
+
+/* Searchable guest picker in the table assignment modal */
+.assign-guest-results {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    background: #fff;
+}
+.assign-guest-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    color: #212529;
+    text-align: left;
+    gap: 3px;
+    transition: background .12s ease;
+}
+.assign-guest-option:last-child { border-bottom: 0; }
+.assign-guest-option:hover, .assign-guest-option:focus-visible { background: #f5f7fa; outline: none; }
+.assign-guest-option.selected { background: #eaf2ff; box-shadow: inset 3px 0 #0d6efd; }
+.assign-guest-option-main { font-weight: 600; line-height: 1.35; }
+.assign-guest-option-meta { color: #6c757d; font-size: .82rem; }
+.assign-guest-empty { padding: 14px 12px; color: #6c757d; font-size: .9rem; }
+#assignGuestSearch { min-height: 44px; }

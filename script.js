@@ -1,3 +1,9 @@
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+}
+
 let guests = JSON.parse(localStorage.getItem('wedding_guests')) || [];
 let expenses = JSON.parse(localStorage.getItem('wedding_expenses')) || [];
 let timeline = JSON.parse(localStorage.getItem('wedding_timeline')) || [];
@@ -265,72 +271,53 @@ function renderTablesView() {
     sortedTableKeys.forEach(tableNum => {
         const guestList = tablesMap[tableNum];
         let tablePersonsSum = 0;
-        let chairsHTML = '';
-
-        const individualChairs = [];
+        let guestRowsHTML = '';
 
         guestList.forEach(g => {
             const originalIndex = guests.indexOf(g);
             const count = parseInt(g.count) || 1;
             tablePersonsSum += count;
 
-            for (let c = 1; c <= count; c++) {
-                individualChairs.push({
-                    name: count > 1 ? `${g.name} (${c})` : g.name,
-                    category: g.category,
-                    originalIndex: originalIndex,
-                    isGroupLeader: c === 1
-                });
-            }
+            let accent = '#0d6efd';
+            if (g.category === 'Невеста') accent = '#d63384';
+            else if (g.category === 'Деца') accent = '#20c997';
+            else if (g.category === 'Заеднички') accent = '#6f42c1';
+
+            guestRowsHTML += `
+                <div class="table-guest-row" style="--guest-accent: ${accent}">
+                    <div class="table-guest-info">
+                        <span class="table-guest-name">${g.name}</span>
+                        <span class="table-guest-meta">${g.category || 'Гостин'}${count > 1 ? ` · ${count} лица` : ''}</span>
+                    </div>
+                    <div class="table-guest-actions">
+                        <span class="table-guest-count">${count}</span>
+                        <button class="table-remove-guest" onclick="removeGuestFromTable(${originalIndex})" title="Отстрани од маса" aria-label="Отстрани ${g.name} од маса">×</button>
+                    </div>
+                </div>
+            `;
         });
 
-        const totalChairs = individualChairs.length;
-        const radius = totalChairs > 6 ? 115 : 95;
-
-        if (totalChairs === 0) {
-            // Приказ кога масата е празна (0 гости)
-            chairsHTML = `<div class="text-muted small my-auto">Празна маса<br><small>(Кликни "+ Додај" за гости)</small></div>`;
-        } else {
-            individualChairs.forEach((chair, i) => {
-                const angle = (i / (totalChairs || 1)) * (2 * Math.PI) - (Math.PI / 2);
-                const x = Math.round(radius * Math.cos(angle));
-                const y = Math.round(radius * Math.sin(angle));
-
-                let borderStyle = 'border-left: 3px solid #0d6efd;';
-                if (chair.category === 'Невеста') borderStyle = 'border-left: 3px solid #d63384;';
-                else if (chair.category === 'Деца') borderStyle = 'border-left: 3px solid #20c997;';
-                else if (chair.category === 'Заеднички') borderStyle = 'border-left: 3px solid #6f42c1;';
-
-                chairsHTML += `
-                    <div class="chair-item" style="transform: translate(${x}px, ${y}px); ${borderStyle}">
-                        ${chair.isGroupLeader ? `<button class="remove-chair-btn" onclick="removeGuestFromTable(${chair.originalIndex})" title="Отстрани">×</button>` : ''}
-                        <span class="chair-name" title="${chair.name}">${chair.name}</span>
-                    </div>
-                `;
-            });
-        }
-
+        const emptyMessage = `<div class="table-empty-state"><i class="fa-regular fa-clipboard mb-2"></i><div>Масата е празна</div><small>Притисни „+ Додај“ за да внесеш гости.</small></div>`;
         let tableCardHTML = `
-            <div class="col-md-6 col-lg-4">
-                <div class="card table-card p-3 h-100 text-center">
-                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                        <h6 class="fw-bold mb-0 text-danger"><i class="fa-solid fa-chair me-1"></i> Маса ${tableNum}</h6>
-                        <div class="d-flex align-items-center gap-1">
-                            <button class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" onclick="openAssignModal('${tableNum}')">+ Додај</button>
-                            <span class="badge ${tablePersonsSum > 0 ? 'bg-danger' : 'bg-secondary'} rounded-pill">Лица: ${tablePersonsSum}</span>
-                            ${tablePersonsSum === 0 ? `<button class="btn btn-sm btn-light text-danger p-0 ms-1" onclick="deleteEmptyTable('${tableNum}')" title="Избриши празна маса"><i class="fa-solid fa-trash small"></i></button>` : ''}
+            <div class="col-12 col-md-6 col-xl-4">
+                <div class="card table-card p-3 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="table-number-icon"><i class="fa-solid fa-utensils"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1 text-dark">Маса ${tableNum}</h6>
+                                <small class="text-muted">${guestList.length} ${guestList.length === 1 ? 'група гости' : 'групи гости'}</small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge ${tablePersonsSum > 0 ? 'bg-danger' : 'bg-secondary'} rounded-pill px-3 py-2">${tablePersonsSum} лица</span>
+                            ${tablePersonsSum === 0 ? `<button class="btn btn-sm btn-light text-danger" onclick="deleteEmptyTable('${tableNum}')" title="Избриши празна маса"><i class="fa-solid fa-trash"></i></button>` : ''}
                         </div>
                     </div>
-                    
-                    <!-- KRUZNA MASA I STOLCINJA -->
-                    <div class="visual-table-container d-flex align-items-center justify-content-center" style="height: ${totalChairs > 6 ? '300px' : '260px'};">
-                        <div class="table-center-circle">
-                            <i class="fa-solid fa-utensils mb-1"></i>
-                            <h6>Маса ${tableNum}</h6>
-                            <span>${tablePersonsSum} лица</span>
-                        </div>
-                        ${chairsHTML}
+                    <div class="table-guests-list">
+                        ${guestRowsHTML || emptyMessage}
                     </div>
+                    <button class="btn btn-outline-danger w-100 mt-3 fw-semibold" onclick="openAssignModal('${tableNum}')"><i class="fa-solid fa-plus me-2"></i>Додај гости на маса</button>
                 </div>
             </div>
         `;
@@ -423,25 +410,71 @@ function removeGuestFromTable(index) {
 function openAssignModal(tableNum) {
     document.getElementById('assignTargetTable').value = tableNum;
     document.getElementById('assignModalTitle').innerHTML = `<i class="fa-solid fa-chair text-danger me-2"></i> Додај Гостин на Маса ${tableNum}`;
-    
-    const select = document.getElementById('assignGuestSelect');
-    select.innerHTML = '<option value="">-- Избери гостин --</option>';
 
-    if (guests.length === 0) {
-        select.innerHTML = '<option value="">Нема внесено гости во системот</option>';
-    } else {
-        guests.forEach((g, idx) => {
-            let text = `${g.name} (${g.count} лица)`;
-            if (g.table && g.table.trim() !== '') {
-                text += ` - (Веќе на Маса ${g.table})`;
-            } else {
-                text += ` - (Без маса)`;
-            }
-            select.innerHTML += `<option value="${idx}">${text}</option>`;
+    const search = document.getElementById('assignGuestSearch');
+    const results = document.getElementById('assignGuestResults');
+    const selected = document.getElementById('assignGuestSelect');
+    const selectionLabel = document.getElementById('assignGuestSelection');
+    selected.value = '';
+    selectionLabel.textContent = '';
+    search.value = '';
+
+    function renderAssignGuestResults() {
+        const query = search.value.trim().toLocaleLowerCase('mk');
+const matches = guests
+    .map((g, idx) => ({ g, idx }))
+    .filter(({ g }) =>
+        !query || g.name.toLocaleLowerCase('mk').includes(query)
+    )
+    .sort((a, b) => {
+        const aHasTable = a.g.table && String(a.g.table).trim() !== '';
+        const bHasTable = b.g.table && String(b.g.table).trim() !== '';
+
+        // Прво гости без маса
+        if (aHasTable !== bHasTable) {
+            return aHasTable ? 1 : -1;
+        }
+
+        // Потоа азбучно по име во рамките на групата
+        return a.g.name.localeCompare(b.g.name, 'mk');
+    })
+    .slice(0, 80);
+
+        if (!guests.length) {
+            results.innerHTML = '<div class="assign-guest-empty">Нема внесено гости во системот.</div>';
+            return;
+        }
+        if (!matches.length) {
+            results.innerHTML = '<div class="assign-guest-empty">Нема пронајдено гостин со тоа име.</div>';
+            return;
+        }
+
+        results.innerHTML = matches.map(({g, idx}) => {
+            const tableText = g.table && g.table.trim() !== ''
+                ? `Веќе на Маса ${escapeHtml(String(g.table))}`
+                : 'Без маса';
+            const isAssigned = g.table && g.table.trim() !== '';
+            return `<button type="button" class="assign-guest-option ${selected.value === String(idx) ? 'selected' : ''}" data-guest-index="${idx}" role="option" aria-selected="${selected.value === String(idx)}">
+                <span class="assign-guest-option-main">${escapeHtml(g.name)}</span>
+                <span class="assign-guest-option-meta">${escapeHtml(String(g.count))} лица · ${tableText}</span>
+            </button>`;
+        }).join('');
+
+        results.querySelectorAll('[data-guest-index]').forEach(button => {
+            button.addEventListener('click', () => {
+                selected.value = button.dataset.guestIndex;
+                const guest = guests[Number(selected.value)];
+                selectionLabel.textContent = `✓ Избран гостин: ${guest.name} (${guest.count} лица)`;
+                renderAssignGuestResults();
+            });
         });
     }
 
+    // Keep the listener single per modal opening.
+    search.oninput = renderAssignGuestResults;
+    renderAssignGuestResults();
     assignModal.show();
+    setTimeout(() => search.focus(), 150);
 }
 
 document.getElementById('assignGuestForm').addEventListener('submit', function(e) {

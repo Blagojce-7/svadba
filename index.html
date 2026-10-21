@@ -440,8 +440,11 @@
                     <form id="assignGuestForm">
                         <input type="hidden" id="assignTargetTable">
                         <div class="mb-3">
-                            <label for="assignGuestSelect" class="form-label small fw-semibold">Избери Гостин од Списокот</label>
-                            <select class="form-select" id="assignGuestSelect" required></select>
+                            <label for="assignGuestSearch" class="form-label small fw-semibold">Пребарај гостин по име</label>
+                            <input type="search" class="form-control mb-2" id="assignGuestSearch" placeholder="🔍 Почни да пишуваш име..." autocomplete="off">
+                            <div id="assignGuestResults" class="assign-guest-results" role="listbox" aria-label="Резултати од пребарување"></div>
+                            <input type="hidden" id="assignGuestSelect" required>
+                            <div id="assignGuestSelection" class="small text-success mt-2" aria-live="polite"></div>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
                             <button type="button" class="btn btn-light rounded-3 px-3" data-bs-dismiss="modal">Откажи</button>
